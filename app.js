@@ -380,7 +380,7 @@ function showFinishedScreen() {
 }
 
 function showNextCard() {
-    if (currentQueue.length === 0 || currentDrawIndex >= sessionTotalCards) {
+    if (currentQueue.length === 0) {
         showFinishedScreen();
         return;
     }
