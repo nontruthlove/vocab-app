@@ -299,15 +299,16 @@ function showNextCard() {
         let textStr = currentCard.en.trim();
         let isSentence = textStr.includes(' ');
         let len = textStr.length;
+        let baseSize = window.innerWidth <= 480 ? 0.65 : 1;
         
         if (isSentence) {
-            if (len > 40) spellInput.style.fontSize = '1.8rem';
-            else if (len > 20) spellInput.style.fontSize = '2.4rem';
-            else spellInput.style.fontSize = '2.8rem';
+            if (len > 40) spellInput.style.fontSize = (1.8 * baseSize) + 'rem';
+            else if (len > 20) spellInput.style.fontSize = (2.4 * baseSize) + 'rem';
+            else spellInput.style.fontSize = (2.8 * baseSize) + 'rem';
         } else {
-            if (len > 14) spellInput.style.fontSize = '2.2rem';
-            else if (len > 10) spellInput.style.fontSize = '2.8rem';
-            else spellInput.style.fontSize = '3.5rem';
+            if (len > 14) spellInput.style.fontSize = (2.2 * baseSize) + 'rem';
+            else if (len > 10) spellInput.style.fontSize = (2.8 * baseSize) + 'rem';
+            else spellInput.style.fontSize = (3.5 * baseSize) + 'rem';
         }
         
         spellInput.focus();
@@ -321,19 +322,20 @@ function showNextCard() {
         let textStr = currentCard.en.trim();
         let isSentence = textStr.includes(' ');
         let len = textStr.length;
+        let baseSize = window.innerWidth <= 480 ? 0.65 : 1;
         
         if (isSentence) {
             enEl.style.whiteSpace = 'normal';
             enEl.style.wordBreak = 'break-word';
-            if (len > 40) enEl.style.fontSize = '1.8rem';
-            else if (len > 20) enEl.style.fontSize = '2.4rem';
-            else enEl.style.fontSize = '2.8rem';
+            if (len > 40) enEl.style.fontSize = (1.8 * baseSize) + 'rem';
+            else if (len > 20) enEl.style.fontSize = (2.4 * baseSize) + 'rem';
+            else enEl.style.fontSize = (2.8 * baseSize) + 'rem';
         } else {
             enEl.style.whiteSpace = 'normal';
             enEl.style.wordBreak = 'break-word';
-            if (len > 14) enEl.style.fontSize = '2.2rem';
-            else if (len > 10) enEl.style.fontSize = '2.8rem';
-            else enEl.style.fontSize = '3.5rem';
+            if (len > 14) enEl.style.fontSize = (2.2 * baseSize) + 'rem';
+            else if (len > 10) enEl.style.fontSize = (2.8 * baseSize) + 'rem';
+            else enEl.style.fontSize = (3.5 * baseSize) + 'rem';
         }
         
         zhEl.innerText = currentCard.zh;

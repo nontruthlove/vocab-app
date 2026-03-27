@@ -353,26 +353,32 @@ input[type="text"]:focus {
 /* Mobile Optimizations */
 @media (max-width: 480px) {
     .center-box {
-        padding: 30px 20px;
-        width: 95%;
+        padding: 25px 20px;
+        width: 90%;
     }
     .input-group {
         flex-direction: column;
     }
-    .top-nav { padding: 15px 15px 10px 25px; }
-    .dashboard-content { padding: 15px 15px 15px 25px; }
+    .top-nav { padding: 15px 10px 10px 25px; }
+    .dashboard-content { padding: 15px 10px 15px 25px; }
     
-    .top-bar { padding: 15px 15px 10px 25px; }
+    .top-bar { padding: 10px 10px 10px 25px; }
+    .icon-btn { width: 36px; height: 36px; min-width: 36px; font-size: 1rem; }
+    .student-name-tag { margin-left: 8px; padding: 6px 10px; font-size: 0.85rem; border-width: 1px; }
+    .speed-select { margin-left: auto; margin-right: 8px; padding: 6px 8px; font-size: 0.85rem; border-width: 1px; }
+    .progress-info { font-size: 0.75rem; min-width: 70px; }
+    .progress-bar-bg { width: 70px; height: 8px; margin-bottom: 3px; }
+    
     .main-card-area { padding: 10px 15px 0 25px; }
-    .flashcard { padding: 25px 15px; border-radius: 25px; }
+    .flashcard { padding: 25px 15px; border-radius: 20px; }
     
-    .en-text { font-size: 2.5rem; word-break: break-word; }
-    .zh-text { font-size: 1.3rem; }
+    .en-text { word-break: break-word; }
+    .zh-text { font-size: 1.2rem; }
     
-    .reaction-buttons { gap: 10px; padding: 20px 15px 30px 25px; }
-    .reaction-btn { height: 90px; border-radius: 20px; }
-    .reaction-btn .emoji { font-size: 3.5rem; }
+    .reaction-buttons { gap: 10px; padding: 15px 15px 25px 25px; }
+    .reaction-btn { height: 80px; border-radius: 16px; border-width: 3px; }
+    .reaction-btn .emoji { font-size: 2.8rem; }
     
-    .spelling-test input { font-size: 1.5rem; padding: 10px; }
-    .audio-btn { width: 40px; height: 40px; font-size: 1.2rem; top: 15px; right: 15px; }
+    .spelling-test input { font-size: 1.4rem; padding: 10px; }
+    .audio-btn { width: 36px; height: 36px; font-size: 1.1rem; top: 12px; right: 12px; }
 }
