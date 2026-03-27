@@ -236,6 +236,7 @@ const spellInput = document.getElementById('spell-input');
 const spellBtn = document.getElementById('check-spell-btn');
 const spellFeedback = document.getElementById('spell-feedback');
 
+window.speechUtterances = [];
 function speak(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -243,9 +244,37 @@ function speak(text) {
         utterance.lang = 'en-US';
         const speedSelect = document.getElementById('speech-speed');
         if (speedSelect) utterance.rate = parseFloat(speedSelect.value) || 1;
+        
+        // Prevent garbage collection in Android Webviews (like LINE)
+        window.speechUtterances.push(utterance);
+        utterance.onend = function() {
+            const idx = window.speechUtterances.indexOf(utterance);
+            if (idx > -1) window.speechUtterances.splice(idx, 1);
+        };
+        utterance.onerror = function() {
+            const idx = window.speechUtterances.indexOf(utterance);
+            if (idx > -1) window.speechUtterances.splice(idx, 1);
+        };
+        
         window.speechSynthesis.speak(utterance);
     }
 }
+
+// Unlock Web Speech API on first interaction (fixes audio in LINE / in-app browsers)
+let speechUnlocked = false;
+function unlockSpeech() {
+    if (speechUnlocked) return;
+    if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance('');
+        u.volume = 0;
+        window.speechSynthesis.speak(u);
+    }
+    speechUnlocked = true;
+    document.removeEventListener('click', unlockSpeech);
+    document.removeEventListener('touchstart', unlockSpeech);
+}
+document.addEventListener('click', unlockSpeech);
+document.addEventListener('touchstart', unlockSpeech);
 document.getElementById('audio-btn').onclick = (e) => { e.stopPropagation(); speak(currentCard.en); };
 document.getElementById('back-btn').onclick = () => { updateDashboard(); showScreen('dashboard'); };
 
@@ -274,7 +303,7 @@ function showFinishedScreen() {
 }
 
 function showNextCard() {
-    if (currentQueue.length === 0 || currentDrawIndex >= sessionTotalCards) {
+    if (currentQueue.length === 0) {
         showFinishedScreen();
         return;
     }
@@ -353,10 +382,15 @@ document.querySelectorAll('.reaction-btn').forEach(btn => {
         const currentIndex = currentQueue.shift();
         
         if (action === 'cry') {
-            currentQueue.push(currentIndex);
+            // 哭臉必須7次內再次出現
+            const insertAt = Math.min(currentQueue.length, 6);
+            currentQueue.splice(insertAt, 0, currentIndex);
         } else if (action === 'neutral') {
-            currentQueue.push(currentIndex);
+            // 沒表情則10次內再次出現
+            const insertAt = Math.min(currentQueue.length, 9);
+            currentQueue.splice(insertAt, 0, currentIndex);
         } else if (action === 'smile') {
+            // 單字卡被點擊過笑臉才可以考學生 -> switch to testMode
             vocabList[currentIndex].testMode = true;
             currentQueue.push(currentIndex);
         }
