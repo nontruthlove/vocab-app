@@ -308,10 +308,10 @@ input[type="text"]:focus {
     margin-bottom: 2px;
 }
 .main-card-area.keyboard-open .test-header .test-title {
-    font-size: 1.38rem;
+    font-size: 1.5rem;
 }
 .main-card-area.keyboard-open .test-header .emoji-icon {
-    font-size: 1.38rem;
+    font-size: 1.5rem;
 }
 .main-card-area.keyboard-open .zh-text {
     font-size: 1.15rem;
@@ -331,7 +331,7 @@ input[type="text"]:focus {
     font-size: 1.1rem;
 }
 .main-card-area.keyboard-open .block-btn {
-    padding: 6px 12px;
+    padding: 10px 12px;
     font-size: 1.25rem;
     margin-top: 0;
     border-radius: 12px;

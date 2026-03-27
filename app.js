@@ -344,11 +344,11 @@ function showFinishedScreen() {
     const summaryList = document.getElementById('summary-mastered-list');
     
     if (sessionMasteredCards.length === 0) {
-        summaryText.innerText = '本次沒有新增完全記住的單字\n沒關係，多練習幾次就會了！💪';
+        summaryText.innerHTML = '本次沒有新增完全記住的單字<br>沒關係，多練習幾次就會了！💪';
         summaryList.style.display = 'none';
         summaryList.innerHTML = '';
     } else {
-        summaryText.innerText = `太棒了！本次完全記住 ${sessionMasteredCards.length} 個單字！🌟`;
+        summaryText.innerHTML = `太棒了！<br>本次完全記住 ${sessionMasteredCards.length} 個單字！🌟`;
         summaryList.style.display = 'flex';
         summaryList.innerHTML = sessionMasteredCards.map(c => `
             <div class="mastered-item">
