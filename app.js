@@ -158,18 +158,26 @@ uploadBtn.addEventListener('change', (e) => {
 document.getElementById('start-btn').onclick = () => {
     let students = getStudents();
     let vocabList = students[currentUser].vocab;
+    let savedQueue = students[currentUser].queue || [];
+    
+    // Filter out mastered cards from saved queue
+    savedQueue = savedQueue.filter(idx => vocabList[idx] && vocabList[idx].testPasses < 2);
     
     // Find unmastered indices
     let unmastered = [];
-    vocabList.forEach((v, i) => { if (v.testPasses < 2) unmastered.push(i); });
+    vocabList.forEach((v, i) => { if (v.testPasses < 2 && !savedQueue.includes(i)) unmastered.push(i); });
     
     unmastered.sort(() => Math.random() - 0.5); // Randomize
     
     // Take up to 30
-    currentQueue = unmastered.slice(0, 30);
+    let fullQueue = savedQueue.concat(unmastered);
+    currentQueue = fullQueue.slice(0, 30);
     sessionTotalCards = currentQueue.length;
     currentDrawIndex = 0;
     sessionMasteredCards = [];
+    
+    students[currentUser].queue = fullQueue.slice(sessionTotalCards);
+    saveStudents(students);
     
     if(currentQueue.length > 0) {
         currentQueue.forEach(idx => {
@@ -237,7 +245,19 @@ const spellBtn = document.getElementById('check-spell-btn');
 const spellFeedback = document.getElementById('spell-feedback');
 
 window.speechUtterances = [];
+let fallbackAudio = null;
 function speak(text) {
+    const isLine = /Line|MicroMessenger|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+    
+    if (isLine) {
+        if (fallbackAudio) fallbackAudio.pause();
+        fallbackAudio = new Audio(`https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(text)}`);
+        const speedSelect = document.getElementById('speech-speed');
+        if (speedSelect) fallbackAudio.playbackRate = parseFloat(speedSelect.value) || 1;
+        fallbackAudio.play().catch(e => console.log('Audio fallback failed', e));
+        return;
+    }
+
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
@@ -287,6 +307,14 @@ function updateProgress() {
 }
 
 function showFinishedScreen() {
+    let students = getStudents();
+    let savedQueue = students[currentUser].queue || [];
+    if (currentQueue && currentQueue.length > 0) {
+        let leftover = currentQueue.filter((idx, pos) => currentQueue.indexOf(idx) === pos && students[currentUser].vocab[idx]?.testPasses < 2);
+        students[currentUser].queue = leftover.concat(savedQueue);
+    }
+    saveStudents(students);
+
     updateDashboard();
     const listEl = document.getElementById('session-mastered-list');
     if (sessionMasteredCards.length === 0) {
@@ -300,10 +328,17 @@ function showFinishedScreen() {
         `).join('');
     }
     showScreen('finished');
+    
+    setTimeout(() => {
+        if(screens.finished.classList.contains('active')) {
+            updateDashboard();
+            showScreen('dashboard');
+        }
+    }, 2500);
 }
 
 function showNextCard() {
-    if (currentQueue.length === 0) {
+    if (currentQueue.length === 0 || currentDrawIndex >= sessionTotalCards) {
         showFinishedScreen();
         return;
     }
