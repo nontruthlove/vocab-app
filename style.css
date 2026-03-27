@@ -305,10 +305,10 @@ input[type="text"]:focus {
     margin-bottom: 2px;
 }
 .main-card-area.keyboard-open .test-header .test-title {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
 }
 .main-card-area.keyboard-open .test-header .emoji-icon {
-    font-size: 1.05rem;
+    font-size: 1.25rem;
 }
 .main-card-area.keyboard-open .zh-text {
     font-size: 1.15rem;
@@ -319,10 +319,13 @@ input[type="text"]:focus {
     font-size: 0.85rem;
 }
 .main-card-area.keyboard-open input {
-    font-size: 1.15rem;
+    font-size: 1.26rem;
     padding: 6px;
     margin-bottom: 6px;
-    height: 40px;
+    height: 44px;
+}
+.main-card-area.keyboard-open input::placeholder {
+    font-size: 0.9rem;
 }
 .main-card-area.keyboard-open .block-btn {
     padding: 6px 12px;
