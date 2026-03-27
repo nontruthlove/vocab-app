@@ -329,7 +329,8 @@ function showNextCard() {
             else if (len > 20) enEl.style.fontSize = '2.4rem';
             else enEl.style.fontSize = '2.8rem';
         } else {
-            enEl.style.whiteSpace = 'nowrap';
+            enEl.style.whiteSpace = 'normal';
+            enEl.style.wordBreak = 'break-word';
             if (len > 14) enEl.style.fontSize = '2.2rem';
             else if (len > 10) enEl.style.fontSize = '2.8rem';
             else enEl.style.fontSize = '3.5rem';
