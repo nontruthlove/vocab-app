@@ -190,6 +190,9 @@ document.getElementById('start-btn').onclick = () => {
         delayed = delayed.slice(extra);
     }
     
+    // Shuffle the combined queue so new words mix with old ones!
+    currentQueue.sort(() => Math.random() - 0.5);
+    
     sessionTotalCards = currentQueue.length;
     currentDrawIndex = 0;
     sessionMasteredCards = [];
@@ -202,6 +205,10 @@ document.getElementById('start-btn').onclick = () => {
         currentQueue.forEach(idx => {
             vocabList[idx].testMode = false; // Always start as flashcard in a new session
         });
+        
+        students[currentUser].vocab = vocabList;
+        saveStudents(students);
+        
         showNextCard();
         showScreen('flashcard');
     } else {
@@ -314,7 +321,17 @@ function unlockSpeech() {
 document.addEventListener('click', unlockSpeech);
 document.addEventListener('touchstart', unlockSpeech);
 document.getElementById('audio-btn').onclick = (e) => { e.stopPropagation(); speak(currentCard.en); };
-document.getElementById('back-btn').onclick = () => { updateDashboard(); showScreen('dashboard'); };
+document.getElementById('back-btn').onclick = () => { 
+    let students = getStudents();
+    let savedQueue = students[currentUser].queue || [];
+    if (currentQueue && currentQueue.length > 0) {
+        let leftover = currentQueue.filter((idx, pos) => currentQueue.indexOf(idx) === pos && students[currentUser].vocab[idx]?.testPasses < 2);
+        students[currentUser].queue = leftover.concat(savedQueue);
+        saveStudents(students);
+    }
+    updateDashboard(); 
+    showScreen('dashboard'); 
+};
 
 function updateProgress() {
     document.getElementById('current-question-num').innerText = currentDrawIndex;
