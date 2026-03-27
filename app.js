@@ -416,15 +416,15 @@ function showNextCard() {
         if (isSentence) {
             enEl.style.whiteSpace = 'normal';
             enEl.style.wordBreak = 'break-word';
-            if (len > 40) enEl.style.fontSize = (1.8 * baseSize) + 'rem';
-            else if (len > 20) enEl.style.fontSize = (2.4 * baseSize) + 'rem';
-            else enEl.style.fontSize = (2.8 * baseSize) + 'rem';
+            if (len > 40) enEl.style.fontSize = (2.16 * baseSize) + 'rem';
+            else if (len > 20) enEl.style.fontSize = (2.88 * baseSize) + 'rem';
+            else enEl.style.fontSize = (3.36 * baseSize) + 'rem';
         } else {
-            enEl.style.whiteSpace = 'normal';
-            enEl.style.wordBreak = 'break-word';
-            if (len > 14) enEl.style.fontSize = (2.2 * baseSize) + 'rem';
-            else if (len > 10) enEl.style.fontSize = (2.8 * baseSize) + 'rem';
-            else enEl.style.fontSize = (3.5 * baseSize) + 'rem';
+            enEl.style.whiteSpace = 'nowrap';
+            enEl.style.wordBreak = 'normal';
+            if (len > 14) enEl.style.fontSize = (2.64 * baseSize) + 'rem';
+            else if (len > 10) enEl.style.fontSize = (3.36 * baseSize) + 'rem';
+            else enEl.style.fontSize = (4.2 * baseSize) + 'rem';
         }
         
         zhEl.innerText = currentCard.zh;
