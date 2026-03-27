@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>背單字神器 - VocabMaster</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="notebook-bg"></div>
+    <div id="app-container">
+        
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active">
+            <div class="center-box">
+                <h1>VocabMaster 🌸</h1>
+                <p>請輸入學生姓名：</p>
+                <div class="input-group">
+                    <input type="text" id="student-name" placeholder="例如：小明" autocomplete="off">
+                    <button id="login-btn" class="primary-btn">登入</button>
+                </div>
+                <div id="profile-list" class="profile-container"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <div class="top-nav">
+                <h2 id="welcome-text">歡迎</h2>
+                <button id="logout-btn" class="text-btn">切換使用者</button>
+            </div>
+            
+            <div class="dashboard-content">
+                <!-- Upload Card -->
+                <div class="card card-upload" style="position: relative;">
+                    <button id="help-btn" class="icon-btn" style="position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; font-size: 1rem;" title="Excel 格式說明">❓</button>
+                    <h3>📂 選擇單字庫</h3>
+                    <p>請選擇您的 Excel 檔案 (.xlsx)</p>
+                    <label class="file-upload-btn">
+                        選擇檔案
+                        <input type="file" id="excel-upload" accept=".xlsx" style="display: none;">
+                    </label>
+                    <p id="upload-status" class="status-msg"></p>
+                </div>
+
+                <!-- Progress Card -->
+                <div class="card card-progress" id="progress-card" style="display:none;">
+                    <h3>✨ 學習進度</h3>
+                    <p>目前資料庫共有 <span id="vocab-count" class="badge">0</span> 個未精熟單字！</p>
+                    <button id="start-btn" class="primary-btn block-btn">隨機抽取 30 張練習</button>
+                    <button id="view-mastered-btn" class="secondary-btn block-btn">查看已精熟的單字 🏆</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flashcard Screen -->
+        <div id="flashcard-screen" class="screen">
+            <div class="top-bar">
+                <button id="back-btn" class="icon-btn">⬅</button>
+                <div class="student-name-tag">🧑‍🎓 <span id="current-student-name"></span></div>
+                <select id="speech-speed" class="speed-select" title="發音速度">
+                    <option value="0.5">🐢 0.5x</option>
+                    <option value="0.8">0.8x</option>
+                    <option value="1" selected>▶️ 1.0x</option>
+                    <option value="1.2">1.2x</option>
+                    <option value="1.5">🐇 1.5x</option>
+                </select>
+                <div class="progress-info">
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+                    <span>進度：<b id="current-question-num">1</b> / <b id="queue-length">30</b></span>
+                </div>
+            </div>
+            
+            <div class="main-card-area">
+                <!-- Flashcard Face -->
+                <div class="flashcard" id="card-front">
+                    <!-- Note: Image removed as per previous step -->
+                    <h2 id="word-en" class="en-text">Apple</h2>
+                    <h3 id="word-zh" class="zh-text">蘋果</h3>
+                    <button id="audio-btn" class="audio-btn">🔊</button>
+                </div>
+
+                <!-- Spelling Test Face -->
+                <div class="flashcard spelling-test" id="spelling-container" style="display:none;">
+                    <div class="test-header">
+                        <span class="emoji-icon">📝</span>
+                        <h2 class="test-title">拼寫測驗</h2>
+                    </div>
+                    <h3 id="test-zh" class="zh-text">蘋果</h3>
+                    <p class="hint">請拼出正確的英文單字：</p>
+                    <input type="text" id="spell-input" placeholder="Enter English..." autocomplete="off">
+                    <button id="check-spell-btn" class="primary-btn block-btn">送出</button>
+                    <p id="spell-feedback"></p>
+                </div>
+            </div>
+
+            <!-- Reaction Buttons -->
+            <div class="reaction-buttons" id="reaction-controls">
+                <button class="reaction-btn cry" data-action="cry">
+                    <span class="emoji">☹️</span>
+                </button>
+                <button class="reaction-btn neutral" data-action="neutral">
+                    <span class="emoji">😐</span>
+                </button>
+                <button class="reaction-btn smile" data-action="smile">
+                    <span class="emoji">😊</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Finished Screen -->
+        <div id="finished-screen" class="screen">
+            <div class="center-box">
+                <h1 class="bounce-anim">太棒了！🎉</h1>
+                <p>這回合的練字已經完成囉！</p>
+                <div id="session-mastered-container" style="background: #fffafa; border-radius: 12px; border: 2px dashed #ffdeeb; padding: 15px; margin: 15px 0; text-align: left; max-height: 200px; overflow-y: auto;">
+                    <h3 style="color: var(--primary-dark); margin-bottom: 10px; text-align: center; font-size: 1.1rem;">🌟 本次完全記住的單字：</h3>
+                    <div id="session-mastered-list" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 700;"></div>
+                </div>
+                <button id="home-btn" class="primary-btn block-btn">回首頁</button>
+            </div>
+        </div>
+
+        <!-- Format Help Modal -->
+        <div id="help-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-content" style="text-align: left; position: relative;">
+                <button id="close-help-icon" style="position: absolute; top: 15px; right: 20px; font-size: 1.8rem; background: none; border: none; color: var(--text-muted); cursor: pointer; font-weight: 800; padding: 0;">&times;</button>
+                <h2 style="text-align: center; margin-bottom: 15px; margin-top: 5px;">📝 Excel 單字表格式說明</h2>
+                <div style="background: #fffafa; padding: 15px; border-radius: 12px; border: 2px dashed #ffdeeb; font-weight: 700; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+                    <p>請準備一個 <b>.xlsx</b> 檔案，規則非常簡單：</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; color: var(--text-main);">
+                        <li style="margin-bottom: 5px;"><b>第一欄</b>（Column A）：填寫小寫或大寫的 <b style="color: var(--primary-dark)">英文單字</b></li>
+                        <li style="margin-bottom: 5px;"><b>第二欄</b>（Column B）：填寫對應的 <b style="color: var(--primary-dark)">中文翻譯</b></li>
+                        <li style="margin-bottom: 5px;">不需標題列，系統會從第一列開始將每一列視為單字卡。</li>
+                        <li>系統具備防呆機制，如果欄位寫反會自動幫您對調。</li>
+                        <li style="color: var(--primary-dark);"><b>注意：發音需要有網路連線功能。</b></li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px; text-align: center; font-weight: 800; color: var(--primary-dark);">📚 正確範例：</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 8px; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #ffdeeb; font-weight: 800;">
+                        <tr style="background: #ffeaa7; color: var(--text-main);">
+                            <th style="padding: 8px; border: 1px solid #ffdeeb;">A 欄</th>
+                            <th style="padding: 8px; border: 1px solid #ffdeeb;">B 欄</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ffdeeb; text-align: center; color: var(--primary-dark);">apple</td>
+                            <td style="padding: 8px; border: 1px solid #ffdeeb; text-align: center;">蘋果</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ffdeeb; text-align: center; color: var(--primary-dark);">banana</td>
+                            <td style="padding: 8px; border: 1px solid #ffdeeb; text-align: center;">香蕉</td>
+                        </tr>
+                    </table>
+                </div>
+                <button id="close-help-btn" class="primary-btn block-btn">我知道了！</button>
+            </div>
+        </div>
+
+        <!-- Mastered Words Modal -->
+        <div id="mastered-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-content" style="position: relative;">
+                <button id="close-mastered-icon" style="position: absolute; top: 15px; right: 20px; font-size: 1.8rem; background: none; border: none; color: var(--text-muted); cursor: pointer; font-weight: 800; padding: 0;">&times;</button>
+                <h2 style="margin-top: 5px;">🏆 已精熟單字</h2>
+                <p>包含你已經成功通過拼寫測驗兩次的單字：</p>
+                <div class="mastered-list" id="mastered-list-container"></div>
+                <button id="close-modal-btn" class="primary-btn block-btn">關閉</button>
+            </div>
+        </div>
+
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
