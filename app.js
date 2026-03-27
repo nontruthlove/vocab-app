@@ -462,7 +462,7 @@ document.querySelectorAll('.reaction-btn').forEach(btn => {
         } else if (action === 'smile') {
             // 單字卡被點擊過笑臉才可以考學生 -> switch to testMode
             vocabList[currentIndex].testMode = true;
-            const insertAt = Math.min(currentQueue.length, 3);
+            const insertAt = Math.min(currentQueue.length, 4);
             currentQueue.splice(insertAt, 0, currentIndex);
         }
         
@@ -501,7 +501,7 @@ function verifySpelling() {
         if (currentCard.testPasses === 0) {
             vocabList[currentIndex].testPasses = 1;
             vocabList[currentIndex].testMode = true;
-            const insertAt = Math.min(currentQueue.length, 3);
+            const insertAt = Math.min(currentQueue.length, 4);
             currentQueue.splice(insertAt, 0, currentIndex);
         } else {
             vocabList[currentIndex].testPasses = 2; 

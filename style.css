@@ -322,10 +322,10 @@ input[type="text"]:focus {
     font-size: 0.85rem;
 }
 .main-card-area.keyboard-open input {
-    font-size: 1.4rem;
+    font-size: 1.26rem;
     padding: 10px;
     margin-bottom: 6px;
-    height: 53px;
+    height: 58px;
 }
 .main-card-area.keyboard-open input::placeholder {
     font-size: 1.3rem;
