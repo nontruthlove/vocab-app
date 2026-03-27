@@ -162,15 +162,14 @@ document.getElementById('start-btn').onclick = () => {
     // Filter out mastered cards from saved queue
     savedQueue = savedQueue.filter(idx => vocabList[idx] && vocabList[idx].testPasses < 2);
     
-    // Cap carry over to ~70% of 30 cards = 21 cards
+    // Cap carry over to 70% of 30 cards = 21 cards
     const MAX_CARRY_OVER = 21;
     let carryOver = savedQueue.slice(0, MAX_CARRY_OVER);
-    let delayed = savedQueue.slice(MAX_CARRY_OVER);
     
-    // Find unmastered indices NOT in carryOver and NOT in delayed
+    // Unmastered are words not in carryOver
     let unmastered = [];
     vocabList.forEach((v, i) => { 
-        if (v.testPasses < 2 && !carryOver.includes(i) && !delayed.includes(i)) {
+        if (v.testPasses < 2 && !carryOver.includes(i)) {
             unmastered.push(i); 
         }
     });
@@ -183,13 +182,6 @@ document.getElementById('start-btn').onclick = () => {
     
     currentQueue = carryOver.concat(freshCards);
     
-    // If still less than 30 (e.g. out of fresh cards), take from delayed
-    if (currentQueue.length < 30 && delayed.length > 0) {
-        let extra = 30 - currentQueue.length;
-        currentQueue = currentQueue.concat(delayed.slice(0, extra));
-        delayed = delayed.slice(extra);
-    }
-    
     // Shuffle the combined queue so new words mix with old ones!
     currentQueue.sort(() => Math.random() - 0.5);
     
@@ -197,8 +189,9 @@ document.getElementById('start-btn').onclick = () => {
     currentDrawIndex = 0;
     sessionMasteredCards = [];
     
-    // The new queue only holds delayed items for now
-    students[currentUser].queue = delayed;
+    // We clear students[currentUser].queue. 
+    // Leftovers will be compiled again at the end or pause of the session.
+    students[currentUser].queue = [];
     saveStudents(students);
     
     if(currentQueue.length > 0) {
@@ -323,10 +316,11 @@ document.addEventListener('touchstart', unlockSpeech);
 document.getElementById('audio-btn').onclick = (e) => { e.stopPropagation(); speak(currentCard.en); };
 document.getElementById('back-btn').onclick = () => { 
     let students = getStudents();
-    let savedQueue = students[currentUser].queue || [];
     if (currentQueue && currentQueue.length > 0) {
         let leftover = currentQueue.filter((idx, pos) => currentQueue.indexOf(idx) === pos && students[currentUser].vocab[idx]?.testPasses < 2);
-        students[currentUser].queue = leftover.concat(savedQueue);
+        let priorSmiled = leftover.filter(idx => students[currentUser].vocab[idx]?.testMode === true || students[currentUser].vocab[idx]?.testPasses === 1);
+        let others = leftover.filter(idx => !(students[currentUser].vocab[idx]?.testMode === true || students[currentUser].vocab[idx]?.testPasses === 1));
+        students[currentUser].queue = priorSmiled.concat(others);
         saveStudents(students);
     }
     updateDashboard(); 
@@ -348,12 +342,13 @@ if(document.getElementById('close-summary-icon')) document.getElementById('close
 
 function showFinishedScreen() {
     let students = getStudents();
-    let savedQueue = students[currentUser].queue || [];
     if (currentQueue && currentQueue.length > 0) {
         let leftover = currentQueue.filter((idx, pos) => currentQueue.indexOf(idx) === pos && students[currentUser].vocab[idx]?.testPasses < 2);
-        students[currentUser].queue = leftover.concat(savedQueue);
+        let priorSmiled = leftover.filter(idx => students[currentUser].vocab[idx]?.testMode === true || students[currentUser].vocab[idx]?.testPasses === 1);
+        let others = leftover.filter(idx => !(students[currentUser].vocab[idx]?.testMode === true || students[currentUser].vocab[idx]?.testPasses === 1));
+        students[currentUser].queue = priorSmiled.concat(others);
+        saveStudents(students);
     }
-    saveStudents(students);
 
     updateDashboard();
     
@@ -380,7 +375,7 @@ function showFinishedScreen() {
 }
 
 function showNextCard() {
-    if (currentQueue.length === 0) {
+    if (currentQueue.length === 0 || currentDrawIndex >= sessionTotalCards) {
         showFinishedScreen();
         return;
     }
@@ -459,17 +454,16 @@ document.querySelectorAll('.reaction-btn').forEach(btn => {
         const currentIndex = currentQueue.shift();
         
         if (action === 'cry') {
-            // 哭臉必須7次內再次出現
-            const insertAt = Math.min(currentQueue.length, 6);
+            const insertAt = Math.min(currentQueue.length, 5);
             currentQueue.splice(insertAt, 0, currentIndex);
         } else if (action === 'neutral') {
-            // 沒表情則10次內再次出現
-            const insertAt = Math.min(currentQueue.length, 9);
+            const insertAt = Math.min(currentQueue.length, 7);
             currentQueue.splice(insertAt, 0, currentIndex);
         } else if (action === 'smile') {
             // 單字卡被點擊過笑臉才可以考學生 -> switch to testMode
             vocabList[currentIndex].testMode = true;
-            currentQueue.push(currentIndex);
+            const insertAt = Math.min(currentQueue.length, 3);
+            currentQueue.splice(insertAt, 0, currentIndex);
         }
         
         students[currentUser].vocab = vocabList;
@@ -507,7 +501,8 @@ function verifySpelling() {
         if (currentCard.testPasses === 0) {
             vocabList[currentIndex].testPasses = 1;
             vocabList[currentIndex].testMode = true;
-            currentQueue.push(currentIndex);
+            const insertAt = Math.min(currentQueue.length, 3);
+            currentQueue.splice(insertAt, 0, currentIndex);
         } else {
             vocabList[currentIndex].testPasses = 2; 
             sessionMasteredCards.push(currentCard);
