@@ -162,20 +162,40 @@ document.getElementById('start-btn').onclick = () => {
     // Filter out mastered cards from saved queue
     savedQueue = savedQueue.filter(idx => vocabList[idx] && vocabList[idx].testPasses < 2);
     
-    // Find unmastered indices
+    // Cap carry over to ~70% of 30 cards = 21 cards
+    const MAX_CARRY_OVER = 21;
+    let carryOver = savedQueue.slice(0, MAX_CARRY_OVER);
+    let delayed = savedQueue.slice(MAX_CARRY_OVER);
+    
+    // Find unmastered indices NOT in carryOver and NOT in delayed
     let unmastered = [];
-    vocabList.forEach((v, i) => { if (v.testPasses < 2 && !savedQueue.includes(i)) unmastered.push(i); });
+    vocabList.forEach((v, i) => { 
+        if (v.testPasses < 2 && !carryOver.includes(i) && !delayed.includes(i)) {
+            unmastered.push(i); 
+        }
+    });
     
     unmastered.sort(() => Math.random() - 0.5); // Randomize
     
-    // Take up to 30
-    let fullQueue = savedQueue.concat(unmastered);
-    currentQueue = fullQueue.slice(0, 30);
+    // Take carryOver + needed from unmastered
+    let needed = 30 - carryOver.length;
+    let freshCards = unmastered.slice(0, needed);
+    
+    currentQueue = carryOver.concat(freshCards);
+    
+    // If still less than 30 (e.g. out of fresh cards), take from delayed
+    if (currentQueue.length < 30 && delayed.length > 0) {
+        let extra = 30 - currentQueue.length;
+        currentQueue = currentQueue.concat(delayed.slice(0, extra));
+        delayed = delayed.slice(extra);
+    }
+    
     sessionTotalCards = currentQueue.length;
     currentDrawIndex = 0;
     sessionMasteredCards = [];
     
-    students[currentUser].queue = fullQueue.slice(sessionTotalCards);
+    // The new queue only holds delayed items for now
+    students[currentUser].queue = delayed;
     saveStudents(students);
     
     if(currentQueue.length > 0) {
