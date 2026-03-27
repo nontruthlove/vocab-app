@@ -16,12 +16,11 @@ function saveStudents(data) {
 const screens = {
     login: document.getElementById('login-screen'),
     dashboard: document.getElementById('dashboard-screen'),
-    flashcard: document.getElementById('flashcard-screen'),
-    finished: document.getElementById('finished-screen')
+    flashcard: document.getElementById('flashcard-screen')
 };
 function showScreen(screenId) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[screenId].classList.add('active');
+    Object.values(screens).forEach(s => s && s.classList.remove('active'));
+    if(screens[screenId]) screens[screenId].classList.add('active');
 }
 
 // --- Login Screen ---
@@ -181,8 +180,7 @@ document.getElementById('start-btn').onclick = () => {
     
     if(currentQueue.length > 0) {
         currentQueue.forEach(idx => {
-            if (vocabList[idx].testPasses === 1) vocabList[idx].testMode = true;
-            else vocabList[idx].testMode = false;
+            vocabList[idx].testMode = false; // Always start as flashcard in a new session
         });
         showNextCard();
         showScreen('flashcard');
@@ -306,6 +304,11 @@ function updateProgress() {
     progressFill.style.width = `${Math.min(100, Math.max(0, rawProgress))}%`;
 }
 
+// --- Summary Modal Logic ---
+const summaryModal = document.getElementById('summary-modal');
+if(document.getElementById('close-summary-btn')) document.getElementById('close-summary-btn').onclick = () => { summaryModal.style.display = 'none'; };
+if(document.getElementById('close-summary-icon')) document.getElementById('close-summary-icon').onclick = () => { summaryModal.style.display = 'none'; };
+
 function showFinishedScreen() {
     let students = getStudents();
     let savedQueue = students[currentUser].queue || [];
@@ -316,25 +319,27 @@ function showFinishedScreen() {
     saveStudents(students);
 
     updateDashboard();
-    const listEl = document.getElementById('session-mastered-list');
+    
+    const summaryText = document.getElementById('summary-text');
+    const summaryList = document.getElementById('summary-mastered-list');
+    
     if (sessionMasteredCards.length === 0) {
-        listEl.innerHTML = '<p style="text-align:center;">本次沒有新增完全記住的單字<br>沒關係，多練習幾次就會了！💪</p>';
+        summaryText.innerText = '本次沒有新增完全記住的單字\n沒關係，多練習幾次就會了！💪';
+        summaryList.style.display = 'none';
+        summaryList.innerHTML = '';
     } else {
-        listEl.innerHTML = sessionMasteredCards.map(c => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #ffdeeb; padding: 5px 0;">
-                <span style="color: var(--primary-dark);">${c.en}</span>
-                <span>${c.zh}</span>
+        summaryText.innerText = `太棒了！本次完全記住 ${sessionMasteredCards.length} 個單字！🌟`;
+        summaryList.style.display = 'flex';
+        summaryList.innerHTML = sessionMasteredCards.map(c => `
+            <div class="mastered-item">
+                <span class="mastered-en">${c.en}</span>
+                <span class="mastered-zh">${c.zh}</span>
             </div>
         `).join('');
     }
-    showScreen('finished');
     
-    setTimeout(() => {
-        if(screens.finished.classList.contains('active')) {
-            updateDashboard();
-            showScreen('dashboard');
-        }
-    }, 2500);
+    showScreen('dashboard');
+    summaryModal.style.display = 'flex';
 }
 
 function showNextCard() {
@@ -495,4 +500,3 @@ function verifySpelling() {
 
 spellBtn.onclick = verifySpelling;
 spellInput.addEventListener('keypress', e => { if (e.key === 'Enter') verifySpelling(); });
-document.getElementById('home-btn').onclick = () => { updateDashboard(); showScreen('dashboard'); };

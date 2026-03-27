@@ -298,19 +298,42 @@ input[type="text"]:focus {
     padding-top: 5px;
 }
 .main-card-area.keyboard-open .flashcard {
-    padding: 15px 25px;
+    padding: 10px 15px;
+    justify-content: flex-start;
 }
 .main-card-area.keyboard-open .test-header {
-    margin-bottom: 5px;
+    margin-bottom: 2px;
+}
+.main-card-area.keyboard-open .test-header .test-title {
+    font-size: 1.05rem;
+}
+.main-card-area.keyboard-open .test-header .emoji-icon {
+    font-size: 1.05rem;
+}
+.main-card-area.keyboard-open .zh-text {
+    font-size: 1.15rem;
+    margin-bottom: 0px;
 }
 .main-card-area.keyboard-open .hint {
-    margin: 10px 0 5px;
-}
-.main-card-area.keyboard-open .emoji-icon {
-    font-size: 1.5rem;
+    margin: 4px 0;
+    font-size: 0.85rem;
 }
 .main-card-area.keyboard-open input {
-    margin-bottom: 10px;
+    font-size: 1.15rem;
+    padding: 6px;
+    margin-bottom: 6px;
+    height: 40px;
+}
+.main-card-area.keyboard-open .block-btn {
+    padding: 6px 12px;
+    font-size: 1.25rem;
+    margin-top: 0;
+    border-radius: 12px;
+}
+.main-card-area.keyboard-open #spell-feedback {
+    margin-top: 4px;
+    font-size: 1rem;
+    min-height: 20px;
 }
 
 /* Reactions */
