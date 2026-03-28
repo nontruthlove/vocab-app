@@ -314,6 +314,10 @@ function unlockSpeech() {
 document.addEventListener('click', unlockSpeech);
 document.addEventListener('touchstart', unlockSpeech);
 document.getElementById('audio-btn').onclick = (e) => { e.stopPropagation(); speak(currentCard.en); };
+const spellAudioBtn = document.getElementById('spell-audio-btn');
+spellAudioBtn.onclick = (e) => { e.stopPropagation(); speak(currentCard.en); };
+spellAudioBtn.addEventListener('mousedown', (e) => e.preventDefault());
+spellAudioBtn.addEventListener('touchstart', (e) => e.preventDefault());
 document.getElementById('back-btn').onclick = () => { 
     let students = getStudents();
     if (currentQueue && currentQueue.length > 0) {
@@ -396,6 +400,12 @@ function showNextCard() {
         spellZHEl.innerText = currentCard.zh;
         spellInput.value = '';
         spellFeedback.innerText = '';
+        
+        // Ensure UI is reset to input mode
+        spellBtn.style.display = 'block';
+        spellBtn.disabled = false;
+        const errorBtn = document.getElementById('error-continue-btn');
+        if (errorBtn) errorBtn.style.display = 'none';
         
         let textStr = currentCard.en.trim();
         let isSentence = textStr.includes(' ');
@@ -507,6 +517,16 @@ function verifySpelling() {
             vocabList[currentIndex].testPasses = 2; 
             sessionMasteredCards.push(currentCard);
         }
+
+        students[currentUser].vocab = vocabList;
+        saveStudents(students);
+        
+        spellBtn.disabled = true;
+        setTimeout(() => {
+            spellBtn.disabled = false;
+            showNextCard();
+        }, 1500);
+
     } else {
         spellFeedback.innerText = `答錯了 ❌ 正確是: ${currentCard.en}`;
         spellFeedback.className = 'feedback-error';
@@ -515,19 +535,22 @@ function verifySpelling() {
         vocabList[currentIndex].testMode = false;
         vocabList[currentIndex].testPasses = 0;
         currentQueue.unshift(currentIndex);
-    }
-    
-    students[currentUser].vocab = vocabList;
-    saveStudents(students);
-    
-    spellBtn.disabled = true;
-    setTimeout(() => {
-        spellBtn.disabled = false;
-        if (input !== correctAns) {
-            currentDrawIndex--;
+        
+        students[currentUser].vocab = vocabList;
+        saveStudents(students);
+        
+        spellBtn.style.display = 'none';
+        const errorBtn = document.getElementById('error-continue-btn');
+        if (errorBtn) {
+            errorBtn.style.display = 'block';
+            errorBtn.onclick = () => {
+                errorBtn.style.display = 'none';
+                spellBtn.style.display = 'block';
+                currentDrawIndex--;
+                showNextCard();
+            };
         }
-        showNextCard();
-    }, 1500);
+    }
 }
 
 spellBtn.onclick = verifySpelling;

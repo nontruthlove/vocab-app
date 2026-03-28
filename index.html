@@ -84,6 +84,7 @@
 
                 <!-- Spelling Test Face -->
                 <div class="flashcard spelling-test" id="spelling-container" style="display:none;">
+                    <button id="spell-audio-btn" class="audio-btn" title="再聽一次">🔊</button>
                     <div class="test-header">
                         <span class="emoji-icon">📝</span>
                         <h2 class="test-title">拼寫測驗</h2>
@@ -92,6 +93,7 @@
                     <p class="hint">請拼出正確的英文單字：</p>
                     <input type="text" id="spell-input" placeholder="Enter English..." autocomplete="off">
                     <button id="check-spell-btn" class="primary-btn block-btn">送出</button>
+                    <button id="error-continue-btn" class="secondary-btn block-btn" style="display:none; border-color: var(--danger); color: var(--danger);">關閉</button>
                     <p id="spell-feedback"></p>
                 </div>
             </div>
