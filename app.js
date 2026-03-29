@@ -496,8 +496,9 @@ spellInput.addEventListener('blur', () => {
 });
 
 function verifySpelling() {
-    const input = spellInput.value.trim().toLowerCase();
-    const correctAns = currentCard.en.trim().toLowerCase();
+    const stripPunc = str => str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()'"?]/g, "").replace(/\s+/g, " ").trim();
+    const input = stripPunc(spellInput.value);
+    const correctAns = stripPunc(currentCard.en);
     
     let students = getStudents();
     let vocabList = students[currentUser].vocab;
