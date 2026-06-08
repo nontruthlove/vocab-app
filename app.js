@@ -3,7 +3,6 @@ let currentUser = null;
 let currentQueue = [];
 let currentCard = null;
 let sessionTotalCards = 0;
-let currentDrawIndex = 0;
 let sessionMasteredCards = [];
 
 function getStudents() {
@@ -186,7 +185,6 @@ document.getElementById('start-btn').onclick = () => {
     currentQueue.sort(() => Math.random() - 0.5);
     
     sessionTotalCards = currentQueue.length;
-    currentDrawIndex = 0;
     sessionMasteredCards = [];
     
     // We clear students[currentUser].queue. 
@@ -332,10 +330,10 @@ document.getElementById('back-btn').onclick = () => {
 };
 
 function updateProgress() {
-    document.getElementById('current-question-num').innerText = currentDrawIndex;
+    document.getElementById('current-question-num').innerText = sessionMasteredCards.length;
     queueLengthEl.innerText = sessionTotalCards;
     
-    let rawProgress = (currentDrawIndex / (sessionTotalCards || 1)) * 100;
+    let rawProgress = (sessionMasteredCards.length / (sessionTotalCards || 1)) * 100;
     progressFill.style.width = `${Math.min(100, Math.max(0, rawProgress))}%`;
 }
 
@@ -379,12 +377,11 @@ function showFinishedScreen() {
 }
 
 function showNextCard() {
-    if (currentQueue.length === 0 || currentDrawIndex >= sessionTotalCards) {
+    if (currentQueue.length === 0) {
         showFinishedScreen();
         return;
     }
     
-    currentDrawIndex++;
     updateProgress();
     
     let students = getStudents();
@@ -496,6 +493,8 @@ spellInput.addEventListener('blur', () => {
 });
 
 function verifySpelling() {
+    if (spellBtn.disabled || spellBtn.style.display === 'none') return;
+
     const stripPunc = str => str.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()'"?]/g, "").replace(/\s+/g, " ").trim();
     const input = stripPunc(spellInput.value);
     const correctAns = stripPunc(currentCard.en);
@@ -547,7 +546,6 @@ function verifySpelling() {
             errorBtn.onclick = () => {
                 errorBtn.style.display = 'none';
                 spellBtn.style.display = 'block';
-                currentDrawIndex--;
                 showNextCard();
             };
         }
